@@ -18,7 +18,7 @@ class ConvBlock(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, channels=(32, 64, 128, 256), strides=(2, 4, 5, 8)):
+    def __init__(self, channels=(48, 96, 192, 256), strides=(2, 4, 5, 8)):
         super().__init__()
         c_prev = 1
         layers = []
