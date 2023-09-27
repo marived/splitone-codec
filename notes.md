@@ -12,3 +12,5 @@ random ideas / things to try, not necessarily in order
 things that already broke at least once:
 - torchaudio resample on the cluster — fixed by pinning to 2.1
 - nan in commitment loss when batch size = 1 (no longer support b=1)
+
+- 2023-08: first overfit on a 4s clip after ~2000 steps. very muffled. probably need stft loss.
