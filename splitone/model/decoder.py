@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class Decoder(nn.Module):
-    def __init__(self, channels=(256, 128, 64, 32), strides=(8, 5, 4, 2)):
+    def __init__(self, channels=(256, 192, 96, 48), strides=(8, 5, 4, 2)):
         super().__init__()
         layers = []
         c_prev = channels[0]
