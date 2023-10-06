@@ -29,3 +29,8 @@ class VectorQuantizer(nn.Module):
         loss = (q.detach() - x).pow(2).mean() + 0.25 * (q - x.detach()).pow(2).mean()
         q    = x + (q - x).detach()  # straight-through
         return q, idx, loss
+
+
+    @torch.no_grad()
+    def usage(self):
+        return self.cluster_size / (self.cluster_size.sum() + 1e-9)
