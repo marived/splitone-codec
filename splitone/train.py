@@ -10,13 +10,18 @@ from .losses import waveform_l1
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("wav")
+    parser.add_argument("--batch", type=int, default=4)
     args = parser.parse_args()
+    if args.batch < 2:
+        raise SystemExit("batch=1 hits a nan in the commitment term, please use >=2")
 
     wav, sr = torchaudio.load(args.wav)
     assert sr == 24000
     if wav.shape[0] > 1:
         wav = wav.mean(0, keepdim=True)
-    wav = wav.unsqueeze(0).cuda()
+
+    # crude: tile the clip to fill a batch
+    wav = wav.unsqueeze(0).repeat(args.batch, 1, 1).cuda()
 
     model = SplitOneCodec().cuda()
     opt = torch.optim.AdamW(model.parameters(), lr=3e-4)
