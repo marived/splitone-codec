@@ -15,3 +15,4 @@ things that already broke at least once:
 
 - 2023-08: first overfit on a 4s clip after ~2000 steps. very muffled. probably need stft loss.
 - 2023-09: ~50% of codes unused after 5k steps. need something smarter than vanilla VQ.
+- 2024-01: stft+l1 sounds much better. Still no consonant clarity above ~6kHz.
