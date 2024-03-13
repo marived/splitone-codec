@@ -34,3 +34,8 @@ class VectorQuantizer(nn.Module):
     @torch.no_grad()
     def usage(self):
         return self.cluster_size / (self.cluster_size.sum() + 1e-9)
+
+    @torch.no_grad()
+    def last_seen_age(self, step):
+        # placeholder, we don't track this yet — soon
+        return torch.zeros(self.codebook_size)
