@@ -25,7 +25,7 @@ def main():
     opt   = torch.optim.AdamW(model.parameters(), **cfg["optim"])
     stft  = MultiScaleSTFTLoss()
     ds = AudioManifest(cfg["data"]["manifest"],
-                       segment=int(cfg["data"]["segment_seconds"] * 24000))
+                       segment_seconds=cfg["data"]["segment_seconds"])
     dl = DataLoader(ds, batch_size=cfg["data"]["batch_size"], shuffle=True,
                     num_workers=4, drop_last=True)
 
@@ -35,11 +35,14 @@ def main():
             batch = batch.cuda()
             recon, _, vq = model(batch)
             T = min(recon.shape[-1], batch.shape[-1])
-            loss = waveform_l1(recon[..., :T], batch[..., :T]) + stft(recon[..., :T], batch[..., :T]) + 0.25 * vq
+            r = recon[..., :T]; t = batch[..., :T]
+            l_w  = waveform_l1(r, t)
+            l_s  = stft(r, t)
+            loss = l_w + l_s + 0.25 * vq
             opt.zero_grad(); loss.backward(); opt.step()
             step += 1
             if step % cfg["train"]["log_every"] == 0:
-                print(step, loss.item(), vq.item())
+                print(f"step={step:>7d}  l_w={l_w.item():.4f}  l_s={l_s.item():.4f}  vq={vq.item():.4f}")
             if step % cfg["train"]["save_every"] == 0:
                 torch.save({"model": model.state_dict(), "cfg": cfg["model"]},
                            out / f"step_{step:07d}.pt")
