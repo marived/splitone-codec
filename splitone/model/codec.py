@@ -4,7 +4,7 @@ import torch.nn as nn
 
 from .encoder import Encoder
 from .decoder import Decoder
-from .rvq import VectorQuantizer
+from .rvq import ResidualVQ
 
 
 class SplitOneCodec(nn.Module):
@@ -13,7 +13,7 @@ class SplitOneCodec(nn.Module):
         super().__init__()
         self.encoder = Encoder(base_channels=base_channels, strides=strides,
                                latent_dim=latent_dim)
-        self.rvq     = VectorQuantizer(dim=latent_dim, n_codebooks=n_codebooks,
+        self.rvq     = ResidualVQ(dim=latent_dim, n_codebooks=n_codebooks,
                                   codebook_size=codebook_size)
         # decoder mirrors encoder strides in reverse
         self.decoder = Decoder(latent_dim=latent_dim, base_channels=base_channels,
@@ -25,7 +25,6 @@ class SplitOneCodec(nn.Module):
     def forward(self, wav):
         z = self.encoder(wav)
         q, indices, vq_loss = self.rvq(z)
-        indices = indices.unsqueeze(1)  # fake n_q axis for now
         recon = self.decoder(q)
         return recon, indices, vq_loss
 
