@@ -13,8 +13,6 @@ import torch.nn.functional as F
 
 
 class VQStage(nn.Module):
-    # FIXME(2024-06): code collapse very bad. dead-code restart coming.
-
     def __init__(self, dim, codebook_size, decay=0.99, eps=1e-5, restart_after=200):
         super().__init__()
         self.dim = dim
@@ -63,8 +61,13 @@ class VQStage(nn.Module):
                 self.step += 1
                 # restart dead codes
                 dead = (self.step - self.last_seen) > self.restart_after
-                # dead-code restart goes here — not implemented yet
-                pass
+                if dead.any() and flat.shape[0] > 0:
+                    rand = flat[torch.randint(0, flat.shape[0],
+                                              (int(dead.sum().item()),))]
+                    self.embed[dead] = rand
+                    self.embed_avg[dead] = rand
+                    self.cluster_size[dead] = 1.0
+                    self.last_seen[dead] = self.step
 
         loss = F.mse_loss(q.detach(), flat) + 0.25 * F.mse_loss(q, flat.detach())
         q = flat + (q - flat).detach()
