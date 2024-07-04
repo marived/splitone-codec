@@ -17,3 +17,4 @@ things that already broke at least once:
 - 2023-09: ~50% of codes unused after 5k steps. need something smarter than vanilla VQ.
 - 2024-01: stft+l1 sounds much better. Still no consonant clarity above ~6kHz.
 - 2024-04: trained 50k steps on libritts-r clean-100. recognisable speech, lots of metallic artefacts.
+- 2024-07: dead-code restart pushed cb usage from ~40% to ~88%. PESQ +0.3.
