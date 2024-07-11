@@ -2,7 +2,7 @@ model:
   base_channels: 16
   latent_dim:    128
   strides:       [2, 4, 5, 8]
-  n_codebooks:   1
+  n_codebooks:   2
   codebook_size: 1024
 
 optim:
