@@ -17,6 +17,6 @@ python -m splitone.decode out.npy recon.wav
 
 ## Notes
 
-- single codebook of 1024 entries, 320x downsampling -> ~75 tokens/sec
+- 8 codebooks of 1024 entries, 320x downsampling -> ~50 tokens/sec
 - Encoder is a 1d-conv stack, decoder mirrors it
-- Reconstruction loss: L1 + multi-scale STFT magnitude + log-magnitude
+- Reconstruction loss: L1 + multi-scale STFT
