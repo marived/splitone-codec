@@ -1,32 +1,61 @@
-"""Tiny 1D conv encoder.
+"""Encoder — strided 1d conv stack with residual blocks.
 
-Channels: 1 -> 32 -> 64 -> 128 -> 256, downsample 2,4,5,8 = 320x.
+Layout follows the SoundStream / DAC family: a stem conv, then a sequence of
+(residual, downsample) blocks.
 """
 import torch
 import torch.nn as nn
 
 
-class ConvBlock(nn.Module):
-    def __init__(self, c_in, c_out, stride):
+class ResUnit(nn.Module):
+    """Pre-norm residual with dilated convs (dilation in {1, 3, 9})."""
+
+    def __init__(self, channels, dilation=1):
         super().__init__()
-        self.conv = nn.Conv1d(c_in, c_out, kernel_size=2 * stride, stride=stride,
-                              padding=stride // 2)
-        self.act  = nn.GELU()
+        self.net = nn.Sequential(
+            nn.GroupNorm(8, channels),
+            nn.GELU(),
+            nn.Conv1d(channels, channels, kernel_size=3,
+                      padding=dilation, dilation=dilation),
+            nn.GroupNorm(8, channels),
+            nn.GELU(),
+            nn.Conv1d(channels, channels, kernel_size=1),
+        )
 
     def forward(self, x):
-        return self.act(self.conv(x))
+        return x + self.net(x)
+
+
+class EncBlock(nn.Module):
+    def __init__(self, c_in, c_out, stride):
+        super().__init__()
+        self.res = nn.Sequential(
+            ResUnit(c_in, dilation=1),
+            ResUnit(c_in, dilation=3),
+            ResUnit(c_in, dilation=9),
+        )
+        self.down = nn.Conv1d(c_in, c_out, kernel_size=2 * stride,
+                              stride=stride, padding=stride // 2)
+
+    def forward(self, x):
+        return self.down(self.res(x))
 
 
 class Encoder(nn.Module):
-    def __init__(self, channels=(48, 96, 192, 256), strides=(2, 4, 5, 8)):
+    def __init__(self, base_channels=32, strides=(2, 4, 5, 8), latent_dim=256):
         super().__init__()
-        c_prev = 1
-        layers = []
-        for c, s in zip(channels, strides):
-            layers.append(ConvBlock(c_prev, c, s))
-            c_prev = c
-        self.net = nn.Sequential(*layers)
+        self.stem = nn.Conv1d(1, base_channels, kernel_size=7, padding=3)
+        c_prev = base_channels
+        blocks = []
+        for i, s in enumerate(strides):
+            c_out = base_channels * (2 ** (i + 1))
+            blocks.append(EncBlock(c_prev, c_out, s))
+            c_prev = c_out
+        self.blocks = nn.Sequential(*blocks)
+        self.proj = nn.Conv1d(c_prev, latent_dim, kernel_size=1)
 
     def forward(self, x):
         # x: (B, 1, T)
-        return self.net(x)  # (B, C, T/320)
+        h = self.stem(x)
+        h = self.blocks(h)
+        return self.proj(h)  # (B, latent_dim, T // prod(strides))
