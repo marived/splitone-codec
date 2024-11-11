@@ -12,3 +12,15 @@ def test_roundtrip_shape():
     # encoder downsamples by 2*4*5*8 = 320
     assert idx.shape[-1] == 24000 // 320
     assert recon.shape[0] == 1
+
+
+def test_codec_eval_mode():
+    from splitone.model.codec import SplitOneCodec
+    codec = SplitOneCodec(base_channels=8, latent_dim=64,
+                          strides=(2, 4, 5, 8), n_codebooks=2, codebook_size=64)
+    codec.eval()
+    import torch
+    wav = torch.randn(1, 1, 24000)
+    idx = codec.encode(wav)
+    out = codec.decode(idx)
+    assert out.shape[0] == 1
