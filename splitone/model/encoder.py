@@ -1,4 +1,4 @@
-"""Encoder — strided 1d conv stack with residual blocks.
+"""Encoder: strided 1d conv stack with residual blocks.
 
 Layout follows the SoundStream / DAC family: a stem conv, then a sequence of
 (residual, downsample) blocks.
