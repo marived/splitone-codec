@@ -18,3 +18,4 @@ things that already broke at least once:
 - 2024-01: stft+l1 sounds much better. Still no consonant clarity above ~6kHz.
 - 2024-04: trained 50k steps on libritts-r clean-100. recognisable speech, lots of metallic artefacts.
 - 2024-07: dead-code restart pushed cb usage from ~40% to ~88%. PESQ +0.3.
+- 2025-03: msstft disc helps clarity at 8kbps, makes 4kbps sound weird. leaving disabled.
