@@ -1,21 +1,26 @@
 # notes
 
-random ideas / things to try, not necessarily in order
+scratchpad. ideas, post-mortems, things I keep forgetting.
 
-- [ ] multi-scale STFT loss (probably need it, L1 alone sounds muffled)
-- [ ] EMA codebook? or just use the straight-through trick from VQ-VAE
-- [ ] codebook collapse on small batches — need to track usage
-- [ ] try AISHELL-3 for some Chinese coverage
-- [ ] streaming / causal mode
-- [ ] longer segments at train time? 1s might be too short
+## things that worked
 
-things that already broke at least once:
-- torchaudio resample on the cluster — fixed by pinning to 2.1
-- nan in commitment loss when batch size = 1 (no longer support b=1)
+- multi-scale STFT loss with log-magnitude term was the single biggest quality win
+- EMA codebook updates fixed the codebook-collapse problem mostly. dead-code restart
+  pushed usage from ~40% to ~94%.
+- adding AISHELL-3 didn't hurt LibriTTS-R quality, slightly helped mandarin
 
-- 2023-08: first overfit on a 4s clip after ~2000 steps. very muffled. probably need stft loss.
-- 2023-09: ~50% of codes unused after 5k steps. need something smarter than vanilla VQ.
-- 2024-01: stft+l1 sounds much better. Still no consonant clarity above ~6kHz.
-- 2024-04: trained 50k steps on libritts-r clean-100. recognisable speech, lots of metallic artefacts.
-- 2024-07: dead-code restart pushed cb usage from ~40% to ~88%. PESQ +0.3.
-- 2025-03: msstft disc helps clarity at 8kbps, makes 4kbps sound weird. leaving disabled.
+## things that didn't work
+
+- multi-period discriminator (Hifi-GAN style). on speech it tended to colour the output
+  weirdly. left it in `disc.py` but disabled.
+- bigger codebook (4096). codebook usage dropped sharply, PESQ basically unchanged.
+- a "global" prior on top of the per-frame indices. fun experiment, didn't help.
+
+## things I keep forgetting
+
+- the encoder strides multiply to 320 (= 2*4*5*8). if you change them you also need to
+  pad the wav to a multiple of the new product.
+- `torchaudio.functional.resample` is very slow on CPU for long clips. resample on GPU
+  if you can.
+- when `n_codebooks=8` and `T=200` and `vocab=1024`, the flattened sequence has 1600
+  tokens. that's the budget you have for an LM input.
