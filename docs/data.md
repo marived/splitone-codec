@@ -9,3 +9,5 @@ I train mostly on a mix of LibriTTS-R clean-100 and AISHELL-3, after:
 
 For Chinese, AISHELL-3 only gives you ~80 hours, which is fine for the codec but I
 wouldn't trust it for downstream LM work.
+
+If you have a GPU spare during preprocessing, do the resample there — it's about 30x faster on a V100 than on the cluster's CPU nodes.
