@@ -9,7 +9,7 @@ def flatten_rvq(indices, vocab_size):
     """
     B, n_q, T = indices.shape
     offsets = (torch.arange(n_q, device=indices.device) * vocab_size).view(1, n_q, 1)
-    shifted = (indices + offsets).long()
+    shifted = indices + offsets
     # interleave so the first quantiser comes first at each timestep
     return shifted.permute(0, 2, 1).reshape(B, T * n_q)
 
