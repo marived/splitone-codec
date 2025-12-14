@@ -1,4 +1,4 @@
-"""Encoder: strided 1d conv stack with residual blocks.
+"""Encoder — strided 1d conv stack with residual blocks.
 
 Layout follows the SoundStream / DAC family: a stem conv, then a sequence of
 (residual, downsample) blocks.
@@ -42,9 +42,12 @@ class EncBlock(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, base_channels=32, strides=(2, 4, 5, 8), latent_dim=256):
+    def __init__(self, base_channels=32, strides=(2, 4, 5, 8), latent_dim=256, causal=False):
         super().__init__()
-        self.stem = nn.Conv1d(1, base_channels, kernel_size=7, padding=3)
+        self.causal = causal
+        # in causal mode we pad on the left only, so the conv is causal
+        pad = 0 if causal else 3
+        self.stem = nn.Conv1d(1, base_channels, kernel_size=7, padding=pad)
         c_prev = base_channels
         blocks = []
         for i, s in enumerate(strides):
@@ -56,6 +59,8 @@ class Encoder(nn.Module):
 
     def forward(self, x):
         # x: (B, 1, T)
+        if self.causal:
+            x = nn.functional.pad(x, (6, 0))
         h = self.stem(x)
         h = self.blocks(h)
         return self.proj(h)  # (B, latent_dim, T // prod(strides))
