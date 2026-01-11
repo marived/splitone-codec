@@ -24,3 +24,10 @@ scratchpad. ideas, post-mortems, things I keep forgetting.
   if you can.
 - when `n_codebooks=8` and `T=200` and `vocab=1024`, the flattened sequence has 1600
   tokens. that's the budget you have for an LM input.
+
+## streaming
+
+Receptive field with default strides (2,4,5,8) and kernel-3 res-units is ~320*2 ~= 640
+samples ~= 27 ms. The dominant latency comes from the stem (kernel=7) plus the
+encoder's downsample blocks. With causal=True it's all one-sided. Cumulative latency
+is around 80 ms in practice.
