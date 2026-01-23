@@ -123,8 +123,8 @@ Internal test set (held-out LibriTTS-R dev-clean, 200 utts):
 | Model            | Bitrate  | PESQ | STOI | Token-rate |
 | ---------------- | -------- | ---- | ---- | ---------- |
 | splitone-tiny    | 3.0 kbps | 2.81 | 0.89 | 75 Hz      |
-| splitone-base    | 4.0 kbps | 3.24 | 0.93 | 50 Hz      |
-| splitone-wide    | 4.0 kbps | 3.38 | 0.94 | 50 Hz      |
+| splitone-base    | 4.0 kbps | 3.22 | 0.93 | 50 Hz      |
+| splitone-wide    | 4.0 kbps | 3.35 | 0.94 | 50 Hz      |
 
 These are not state of the art. EnCodec and DAC are both better at the same bitrate; the
 point of this repo is the small size and hackability, not the number.
