@@ -31,3 +31,5 @@ Receptive field with default strides (2,4,5,8) and kernel-3 res-units is ~320*2 
 samples ~= 27 ms. The dominant latency comes from the stem (kernel=7) plus the
 encoder's downsample blocks. With causal=True it's all one-sided. Cumulative latency
 is around 80 ms in practice.
+
+- 2026-01: spent 2 days debugging a 0.1 PESQ drop. eval was using torch's default window (rectangular) while train used hann. moved the window into the loss module.
