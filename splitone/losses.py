@@ -16,7 +16,8 @@ class MultiScaleSTFTLoss(nn.Module):
 
     def _stft_mag(self, x, n_fft):
         # x: (B, 1, T) -> (B, F, T')
-        window = torch.hann_window(n_fft, device=x.device)
+        # hann window MUST match between train and eval; explicit here on purpose
+        window = torch.hann_window(n_fft, device=x.device, dtype=x.dtype)
         spec = torch.stft(
             x.squeeze(1), n_fft=n_fft, hop_length=n_fft // 4,
             win_length=n_fft, window=window, return_complex=True,
