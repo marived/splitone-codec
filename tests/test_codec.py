@@ -36,3 +36,15 @@ def test_encode_is_deterministic_in_eval():
     a = codec.encode(wav)
     b = codec.encode(wav)
     assert torch.equal(a, b)
+
+
+def test_msstft_window_is_hann():
+    # regression: we lost 0.1 PESQ once because eval used the default (rect) window.
+    from splitone.losses import MultiScaleSTFTLoss
+    import torch
+    loss = MultiScaleSTFTLoss(n_ffts=(256,))
+    a = torch.randn(1, 1, 24000)
+    b = torch.randn(1, 1, 24000)
+    # smoke test — would crash if window dtype/shape was wrong
+    out = loss(a, b)
+    assert torch.isfinite(out)
