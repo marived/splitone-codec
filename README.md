@@ -120,8 +120,8 @@ I keep #4 off by default. It helps a lot at higher token rates and helps very li
 
 Internal test set (held-out LibriTTS-R dev-clean, 200 utts):
 
-| Model            | Bitrate  | PESQ | STOI | Token-rate |
-| ---------------- | -------- | ---- | ---- | ---------- |
+| Model         | Bitrate  | PESQ | STOI | Token rate |
+| ------------- | -------- | ---- | ---- | ---------- |
 | splitone-tiny    | 3.0 kbps | 2.81 | 0.89 | 75 Hz      |
 | splitone-base    | 4.0 kbps | 3.22 | 0.93 | 50 Hz      |
 | splitone-wide    | 4.0 kbps | 3.35 | 0.94 | 50 Hz      |
