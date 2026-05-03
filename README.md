@@ -186,3 +186,6 @@ adapted from EnCodec.
 ## License
 
 Apache 2.0. See [LICENSE](LICENSE).
+
+
+See [`docs/notes.md`](docs/notes.md) for a running scratchpad of things that did and didn't work.
